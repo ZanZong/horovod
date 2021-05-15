@@ -83,6 +83,7 @@ class BaseElasticTests:
                 command_args = ['horovodrun',
                                 '-np', str(np),
                                 '--min-np', str(min_np),
+                                '--verbose',
                                 '--log-level', 'DEBUG']
                 if hosts is not None:
                     command_args += ['-H', hosts]
