@@ -67,8 +67,8 @@ class FP16Compressor(Compressor):
 class Compression(object):
     """Optional gradient compression algorithm used during allreduce."""
 
-    """Do not compress the gradients. This is the default."""
     none = NoneCompressor
+    """Do not compress the gradients. This is the default."""
 
-    """Compress all floating point gradients to 16-bit."""
     fp16 = FP16Compressor
+    """Compress all floating point gradients to 16-bit."""
