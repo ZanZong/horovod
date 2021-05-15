@@ -383,63 +383,6 @@ oneccl_env="\\\$(cat:/oneccl_env):&&"
 oneccl_cmd_ofi="${oneccl_env}:echo:'/mpirun_command_ofi':>:/mpirun_command:&&"
 oneccl_cmd_mpi="${oneccl_env}:echo:'/mpirun_command_mpi':>:/mpirun_command:&&"
 
-# run all the cpu unit tests and integration tests
-for test in ${tests[@]-}; do
-  if [[ ${test} == *-cpu-* ]]; then
-    # if gloo is specified, run gloo cpu unit tests and integration tests
-    if [[ ${test} == *-gloo* ]]; then
-      run_gloo ${test} "cpu"
-    fi
-
-    # if oneCCL is specified, run some tests twice,
-    # once with mpirun_command_ofi, and once with mpirun_command_mpi
-    if [[ ${test} == *oneccl* ]]; then
-      # run mpi cpu unit tests and integration tests
-      run_mpi ${test} "cpu" ${oneccl_cmd_mpi}
-      run_mpi ${test} "cpu" ${oneccl_cmd_ofi}
-
-      # always run spark tests which use MPI and Gloo
-      run_spark_integration ${test} "cpu"
-
-      # no runner application, world size = 1
-      run_single_integration ${test} "cpu" ${oneccl_cmd_mpi}
-      run_single_integration ${test} "cpu" ${oneccl_cmd_ofi}
-    else
-      # run mpi cpu unit tests and integration tests
-      if [[ ${test} == *mpi* ]]; then
-        run_mpi ${test} "cpu"
-      fi
-
-      # always run spark tests which use MPI and Gloo
-      run_spark_integration ${test} "cpu"
-
-      # no runner application, world size = 1
-      run_single_integration ${test} "cpu"
-    fi
-  fi
-done
-
-# wait for all cpu unit and integration tests to finish
-echo "- wait"
-
-# run 4x gpu unit tests
-for test in ${tests[@]-}; do
-  if [[ ${test} == *-gpu-* ]] || [[ ${test} == *-mixed-* ]]; then
-    # if gloo is specified, run gloo gpu unit tests
-    if [[ ${test} == *-gloo* ]]; then
-      run_gloo_pytest ${test} "4x-gpu-v510"
-    fi
-
-    # if mpi is specified, run mpi gpu unit tests
-    if [[ ${test} == *mpi* ]]; then
-      run_mpi_pytest ${test} "4x-gpu-v510"
-    fi
-  fi
-done
-
-# wait for all gpu unit tests to finish
-echo "- wait"
-
 # run 2x gpu integration tests
 for test in ${tests[@]-}; do
   if [[ ${test} == *-gpu-* ]] || [[ ${test} == *-mixed-* ]]; then
